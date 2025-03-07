@@ -2,5 +2,5 @@
 
 internal interface IEventGridEventHttpContextHandler
 {
-    public Task HandleAsync(HttpContext context, string topic);
+    Task HandleAsync(HttpContext context, string topic);
 }
