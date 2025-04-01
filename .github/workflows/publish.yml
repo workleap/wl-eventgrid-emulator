@@ -9,12 +9,11 @@ on:
 permissions:
   id-token: write
   contents: read
+  packages: write
 
 jobs:
   publish:
     runs-on: [self-hosted, idp]
-    permissions:
-      packages: write
 
     steps:
       - name: Checkout repository

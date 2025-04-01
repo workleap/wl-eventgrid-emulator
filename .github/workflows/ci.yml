@@ -14,13 +14,33 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, idp]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: 'Azuze CLI login'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Get Secrets from Azure Key Vault
+        id: get_secrets
+        run: |
+          # Set env.DOCKERHUB_TOKEN
+          DOCKERHUB_TOKEN=$(az keyvault secret show --vault-name ${{ vars.WORKLEAP_GLOBAL_KEYVAULT_NAME }} --name "workleap-docker-hub-token" --query value -o tsv)
+          echo "::add-mask::$DOCKERHUB_TOKEN"
+          echo "dockerhub_token=$DOCKERHUB_TOKEN" >> $GITHUB_OUTPUT
 
       - uses: actions/setup-dotnet@v4
 
