@@ -6,12 +6,30 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, idp]
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
+      - name: 'Azuze CLI login'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Get Secrets from Azure Key Vault
+        id: get_secrets
+        run: |
+          # Set env.DOCKERHUB_TOKEN
+          DOCKERHUB_TOKEN=$(az keyvault secret show --vault-name ${{ vars.IDP_CICD_KEYVAULT_NAME }} --name "workleap-docker-hub-token" --query value -o tsv)
+          echo "::add-mask::$DOCKERHUB_TOKEN"
+          echo "dockerhub_token=$DOCKERHUB_TOKEN" >> $GITHUB_OUTPUT
+
       - uses: actions/setup-dotnet@v4
 
       - run: ./Build.ps1
@@ -21,7 +39,7 @@ jobs:
         uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
         with:
           username: ${{ secrets.WORKLEAP_DOCKERHUB_USERNAME }}
-          password: ${{ secrets.WORKLEAP_DOCKERHUB_TOKEN }}
+          password: ${{ steps.get_secrets.outputs.dockerhub_token }}
 
       - name: Docker metadata
         id: meta
