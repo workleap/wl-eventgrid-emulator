@@ -26,7 +26,7 @@ jobs:
         id: get_secrets
         run: |
           # Set env.DOCKERHUB_TOKEN
-          DOCKERHUB_TOKEN=$(az keyvault secret show --vault-name ${{ vars.IDP_CICD_KEYVAULT_NAME }} --name "workleap-docker-hub-token" --query value -o tsv)
+          DOCKERHUB_TOKEN=$(az keyvault secret show --vault-name ${{ vars.WORKLEAP_GLOBAL_KEYVAULT_NAME }} --name "workleap-docker-hub-token" --query value -o tsv)
           echo "::add-mask::$DOCKERHUB_TOKEN"
           echo "dockerhub_token=$DOCKERHUB_TOKEN" >> $GITHUB_OUTPUT
 
