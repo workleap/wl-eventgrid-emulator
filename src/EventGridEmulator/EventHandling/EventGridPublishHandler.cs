@@ -14,6 +14,7 @@ internal sealed class EventGridPublishHandler
     private const string CloudEventContentType = "application/cloudevents+json; charset=utf-8";
     private const string CloudEventBatchContentType = "application/cloudevents-batch+json; charset=utf-8";
     private const string EventGridEventContentType = "application/json";
+    private const string EventGridEventWithCharsetContentType = "application/json; charset=utf-8";
 
     private readonly ILogger<EventGridPublishHandler> _logger;
     private readonly IEventGridEventHttpContextHandler _eventGridEventHttpContextHandler;
@@ -42,6 +43,7 @@ internal sealed class EventGridPublishHandler
         switch (context.Request.ContentType)
         {
             case EventGridEventContentType:
+            case EventGridEventWithCharsetContentType:
                 return this._eventGridEventHttpContextHandler.HandleAsync(context, topic);
 
             case CloudEventContentType:
