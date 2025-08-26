@@ -9,11 +9,11 @@ Always reference these instructions first and fallback to search or bash command
 - Bootstrap, build, and test the repository:
   - Install .NET 9.0 SDK: `curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 9.0 --install-dir ~/.dotnet`
   - Add to PATH: `export PATH="$HOME/.dotnet:$PATH"`
-  - Build and test: `pwsh -File Build.ps1` -- takes 12 seconds to complete. NEVER CANCEL. Set timeout to 60+ seconds.
+  - Build and test: `pwsh -File Build.ps1`
   - Alternative build commands (from src/ directory):
-    - `dotnet clean -c Release src/` -- takes 1.4 seconds
-    - `dotnet build -c Release src/` -- takes 5 seconds  
-    - `dotnet test -c Release src/ --no-restore` -- takes 5 seconds. NEVER CANCEL. Set timeout to 60+ seconds.
+    - `dotnet clean -c Release src/`
+    - `dotnet build -c Release src/`
+    - `dotnet test -c Release src/ --no-restore`
 
 - Run the Event Grid emulator locally:
   - ALWAYS run the bootstrapping steps first.
