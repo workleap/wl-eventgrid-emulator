@@ -18,7 +18,7 @@ Always reference these instructions first and fallback to search or bash command
 - Run the Event Grid emulator locally:
   - ALWAYS run the bootstrapping steps first.
   - Navigate to: `cd src/EventGridEmulator`
-  - Start emulator: `dotnet run` -- starts in 2.5 seconds on http://localhost:6500
+  - Start emulator: `dotnet run` -- starts on http://localhost:6500
   - Health check: `curl -X GET http://localhost:6500/health` returns "Healthy"
   - Default configuration supports both push webhooks and pull subscriptions
   - Application logs show loaded topics and subscribers on startup
