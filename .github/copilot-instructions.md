@@ -7,7 +7,11 @@ Always reference these instructions first and fallback to search or bash command
 ## Working Effectively
 
 - Bootstrap, build, and test the repository:
-  - Install .NET 9.0 SDK: `curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 9.0 --install-dir ~/.dotnet`
+  - Install .NET 9.0 SDK:
+    1. Download the install script: `curl -sSL https://dot.net/v1/dotnet-install.sh -o dotnet-install.sh`
+    2. (Optional but recommended) [Verify the script's integrity](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script#verify-download).
+    3. Run the script: `bash dotnet-install.sh --channel 9.0 --install-dir ~/.dotnet`
+    4. (Alternatively, use your OS package manager if available: [see official docs](https://learn.microsoft.com/en-us/dotnet/core/install/).)
   - Add to PATH: `export PATH="$HOME/.dotnet:$PATH"`
   - Build and test: `pwsh -File Build.ps1`
   - Alternative build commands (from src/ directory):
