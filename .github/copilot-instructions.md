@@ -24,7 +24,7 @@ Always reference these instructions first and fallback to search or bash command
   - Application logs show loaded topics and subscribers on startup
 
 - Format and lint code:
-  - Format code: `dotnet format` (from src/ directory) -- takes 12 seconds. NEVER CANCEL. Set timeout to 30+ seconds.
+  - Format code: `dotnet format` (from src/ directory)
   - Verify formatting: `dotnet format --verify-no-changes` (from src/ directory) -- fails if formatting is needed
   - The project uses extensive .editorconfig rules for C# code analysis
   - NOTE: Some files currently have formatting issues (final newlines, encoding) that need to be fixed
