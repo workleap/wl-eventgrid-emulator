@@ -3,10 +3,6 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Azure.Messaging.EventGrid" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
