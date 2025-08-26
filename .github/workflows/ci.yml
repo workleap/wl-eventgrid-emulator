@@ -22,7 +22,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - uses: actions/setup-dotnet@v4
+      - name: Authenticate to Azure DevOps artifacts
+        uses: workleap/wl-reusable-workflows/.github/actions/az-artifact-authenticate@main
 
       - run: ./Build.ps1
         shell: pwsh

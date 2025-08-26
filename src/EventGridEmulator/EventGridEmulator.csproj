@@ -3,6 +3,10 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Azure.Messaging.EventGrid" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
@@ -13,7 +17,6 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="EventGridEmulator.Tests" />
-    <Content Include="..\.dockerignore" Link=".dockerignore" />
 
     <!-- This appsettings.json will never be shipped in the released product -->
     <!-- It must be manually provided by the user, but we can use this one when debugging in an IDE -->
