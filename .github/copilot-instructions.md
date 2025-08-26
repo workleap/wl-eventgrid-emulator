@@ -36,7 +36,25 @@ Always reference these instructions first and fallback to search or bash command
 - ALWAYS test basic event publishing functionality after making changes:
   - Start the emulator: `dotnet run` in src/EventGridEmulator/
   - Test health: `curl -X GET http://localhost:6500/health`
-  - Publish test event: `curl -X POST http://localhost:6500/topicfoobar/api/events -H "Content-Type: application/json" -d '[{"id":"test123","subject":"test-subject","eventType":"test.event","dataVersion":"1.0","data":{"message":"test data"}}]'`
+  - Publish test event:
+
+    ```sh
+    curl -X POST http://localhost:6500/topicfoobar/api/events \
+      -H "Content-Type: application/json" \
+      -d @- <<EOF
+    [
+      {
+        "id": "test123",
+        "subject": "test-subject",
+        "eventType": "test.event",
+        "dataVersion": "1.0",
+        "data": {
+          "message": "test data"
+        }
+      }
+    ]
+    EOF
+    ```
   - Verify events appear in application logs for pull subscriptions
 - You cannot build or test the Docker image in this environment due to certificate restrictions.
 - Always run `dotnet format` before you are done or the CI (.github/workflows/ci.yml) will fail.
