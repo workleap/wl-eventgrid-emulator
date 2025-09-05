@@ -8,6 +8,8 @@ namespace EventGridEmulator.EventHandling;
 
 internal sealed class PullQueueHttpContextHandler
 {
+    private static readonly ReceiveResults EmptyReceiveResult = new() { Value = [] };
+
     [StringSyntax("Route")]
     public const string ReceiveRoute = "topics/{topic}/eventsubscriptions/{subscription}:receive";
 
@@ -22,29 +24,41 @@ internal sealed class PullQueueHttpContextHandler
 
     public static async Task<IResult> HandleReceiveAsync([FromServices] ILogger<PullQueueHttpContextHandler> logger, [FromRoute] string topic, [FromRoute] string subscription, [FromServices] TopicSubscribers<CloudEvent> topicSubscribers, CancellationToken cancellationToken)
     {
-        var result = await topicSubscribers.GetEventAsync(topic, subscription, cancellationToken);
-        var receiveResults = new ReceiveResults
+        // To better emulate EventGrid's behavior, after a while without any event being received, the request should return empty
+        var internalCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        internalCancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(50));
+
+        try
         {
-            Value = new[]
+            var result = await topicSubscribers.GetEventAsync(topic, subscription, internalCancellationTokenSource.Token);
+            var receiveResults = new ReceiveResults
             {
-                new EventObject
+                Value = new[]
                 {
-                    BrokerProperties = new BrokerProperties
+                    new EventObject
                     {
-                        DeliveryCount = 1, // currently only support receiving one event at a time
-                        LockToken = result.LockToken,
+                        BrokerProperties = new BrokerProperties
+                        {
+                            DeliveryCount = 1, // currently only support receiving one event at a time
+                            LockToken = result.LockToken,
+                        },
+                        Event = result.Item,
                     },
-                    Event = result.Item,
                 },
-            },
-        };
+            };
 
-        if (logger.IsEnabled(LogLevel.Information))
-        {
-            logger.LogInformation("Event pulled from topic '{Topic}' for subscription '{SubscriberName}' with payload '{Payload}'", topic, subscription, EventsSerializer.SerializeEventsForDebugPurposes(receiveResults));
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation("Event pulled from topic '{Topic}' for subscription '{SubscriberName}' with payload '{Payload}'", topic, subscription, EventsSerializer.SerializeEventsForDebugPurposes(receiveResults));
+            }
+
+            return Results.Ok(receiveResults);
         }
-
-        return Results.Ok(receiveResults);
+        catch (OperationCanceledException ex) when (internalCancellationTokenSource.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            // Internal timeout reached without any event being available, return empty
+            return Results.Ok(EmptyReceiveResult);
+        }
     }
 
     public static async Task<IResult> HandleAcknowledgeAsync([FromRoute] string topic, [FromRoute] string subscription, [FromBody] LockTokensRequestData requestData, [FromServices] TopicSubscribers<CloudEvent> topicSubscribers)
