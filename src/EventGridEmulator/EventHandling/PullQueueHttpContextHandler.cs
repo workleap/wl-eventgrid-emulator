@@ -9,6 +9,7 @@ namespace EventGridEmulator.EventHandling;
 internal sealed class PullQueueHttpContextHandler
 {
     private static readonly ReceiveResults EmptyReceiveResult = new() { Value = [] };
+    private static readonly TimeSpan ReceiveTimeout = TimeSpan.FromSeconds(50);
 
     [StringSyntax("Route")]
     public const string ReceiveRoute = "topics/{topic}/eventsubscriptions/{subscription}:receive";
@@ -25,8 +26,8 @@ internal sealed class PullQueueHttpContextHandler
     public static async Task<IResult> HandleReceiveAsync([FromServices] ILogger<PullQueueHttpContextHandler> logger, [FromRoute] string topic, [FromRoute] string subscription, [FromServices] TopicSubscribers<CloudEvent> topicSubscribers, CancellationToken cancellationToken)
     {
         // To better emulate EventGrid's behavior, after a while without any event being received, the request should return empty
-        var internalCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        internalCancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(50));
+        using var internalCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        internalCancellationTokenSource.CancelAfter(ReceiveTimeout);
 
         try
         {
@@ -54,7 +55,7 @@ internal sealed class PullQueueHttpContextHandler
 
             return Results.Ok(receiveResults);
         }
-        catch (OperationCanceledException ex) when (internalCancellationTokenSource.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (internalCancellationTokenSource.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
         {
             // Internal timeout reached without any event being available, return empty
             return Results.Ok(EmptyReceiveResult);
