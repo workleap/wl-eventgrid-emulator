@@ -18,7 +18,7 @@ jobs:
         shell: pwsh
 
       - name: Docker login
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4
         with:
           username: ${{ secrets.WORKLEAP_DOCKERHUB_USERNAME }}
           password: ${{ secrets.WORKLEAP_DOCKERHUB_TOKEN }}
